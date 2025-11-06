@@ -23,7 +23,7 @@ interface JobFormData {
   contactEmail: string
   contactPhone: string
   applicationDeadline: string
-  companyLogoUrl: string
+  companyUrl: string
 }
 
 const initialFormData: JobFormData = {
@@ -38,7 +38,7 @@ const initialFormData: JobFormData = {
   contactEmail: "",
   contactPhone: "",
   applicationDeadline: "",
-  companyLogoUrl: "",
+  companyUrl: "",
 }
 
 function FormPageContent() {

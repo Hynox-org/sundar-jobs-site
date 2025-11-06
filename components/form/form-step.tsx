@@ -165,8 +165,8 @@ export default function FormStep({ formData, errors, onChange }: FormStepProps) 
           <label className="block text-sm font-semibold mb-2 text-text">Company Logo URL (Optional)</label>
           <input
             type="url"
-            name="companyLogoUrl"
-            value={formData.companyLogoUrl}
+            name="companyUrl"
+            value={formData.companyUrl}
             onChange={onChange}
             placeholder="https://..."
             className="input-field"
