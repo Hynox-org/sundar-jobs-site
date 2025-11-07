@@ -5,9 +5,18 @@ import { useState, useEffect } from "react"
 import Header from "@/components/layout/header"
 import { FileText, Bookmark, Settings } from "lucide-react"
 
+interface DraftData {
+  id: string
+  jobTitle: string
+  formData?: {
+    companyName?: string
+  }
+  savedAt: string
+}
+
 export default function Home() {
   const router = useRouter()
-  const [drafts, setDrafts] = useState([])
+const [drafts, setDrafts] = useState<DraftData[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
