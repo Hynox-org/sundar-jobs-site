@@ -34,7 +34,10 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next\\dev/types/**/*.ts",
-    ".next\\dev/types/**/*.ts"
+    ".next\\dev/types/**/*.ts",
+    "!components/themed-text.tsx",
+    "!components/themed-view.tsx",
+    "!hooks/use-color-scheme.web.ts"
   ],
   "exclude": [
     "node_modules"
