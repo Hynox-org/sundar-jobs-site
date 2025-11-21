@@ -5,8 +5,16 @@ import { useRouter } from "next/navigation" // Import useRouter
 import { supabase } from '@/lib/supabase'
 import { Session } from '@supabase/supabase-js'
 
+interface AuthTokenData {
+  accessToken: string;
+  refreshToken: string;
+  expiresIn?: number;
+  tokenType?: string;
+}
+
 interface AuthContextType {
   session: Session | null;
+  authToken: AuthTokenData | null;
   isLoggedIn: boolean;
   isAdmin: boolean;
   isLoading: boolean;
@@ -19,22 +27,29 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter(); // Initialize useRouter
   const [session, setSession] = useState<Session | null>(null);
+  const [authToken, setAuthToken] = useState<AuthTokenData | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchSession = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        setSession(session);
-        setIsLoggedIn(!!session);
+    const processSession = async (currentSession: Session | null) => {
+      setSession(currentSession);
+      setIsLoggedIn(!!currentSession);
 
-        if (session) {
+      if (currentSession) {
+        setAuthToken({
+          accessToken: currentSession.access_token,
+          refreshToken: currentSession.refresh_token,
+          expiresIn: currentSession.expires_in,
+          tokenType: currentSession.token_type,
+        });
+
+        try {
           const { data: profile, error } = await supabase
             .from('profiles')
             .select('role')
-            .eq('id', session.user.id)
+            .eq('id', currentSession.user.id)
             .single();
 
           if (error) {
@@ -42,10 +57,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           } else if (profile) {
             setIsAdmin(profile.role === 'admin');
           }
+        } catch (err: any) {
+          console.error("Error fetching profile async:", err);
         }
-      } catch (e) {
+      } else {
+        setAuthToken(null);
+        setIsAdmin(false);
+      }
+      setIsLoading(false);
+    };
+
+    const fetchSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        processSession(session);
+      } catch (e: any) {
         console.error("Error initializing auth session:", e);
-      } finally {
         setIsLoading(false);
       }
     };
@@ -54,24 +81,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (_event, newSession) => {
-        setSession(newSession);
-        setIsLoggedIn(!!newSession);
-        if (newSession) {
-          const { data: profile, error } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', newSession.user.id)
-            .single();
-
-          if (error) {
-            console.error("Error fetching profile:", error);
-          } else if (profile) {
-            setIsAdmin(profile.role === 'admin');
-          }
-        } else {
-          setIsAdmin(false);
-        }
-        setIsLoading(false); // Ensure loading is false after any auth state change
+        processSession(newSession);
       }
     );
 
@@ -81,8 +91,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signIn = () => {
-    // This function will typically redirect to the login page or trigger a modal
-    // For now, it's a placeholder. The actual sign-in happens on the login page.
     console.log("Sign-in initiated (redirect to login page)");
   };
 
@@ -94,6 +102,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       alert(`Logout Error: ${error.message}`);
     } else {
       setSession(null);
+      setAuthToken(null);
       setIsLoggedIn(false);
       setIsAdmin(false);
       alert("You have been logged out.");
@@ -102,9 +111,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(false);
   };
 
-
   return (
-    <AuthContext.Provider value={{ session, isLoggedIn, isAdmin, isLoading, signIn, signOut }}>
+    <AuthContext.Provider value={{ session, authToken, isLoggedIn, isAdmin, isLoading, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );

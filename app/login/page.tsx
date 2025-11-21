@@ -3,10 +3,14 @@
 import { useRouter } from "next/navigation"
 import React, { useState } from 'react'
 import { supabase } from '@/lib/supabase'
-// import { Alert } from 'react-native' // Removed, using browser alert for web
+import { useNotification } from "@/hooks/useNotification"
+import { useAuth } from '@/context/auth-context'
 
 export default function AuthenticateScreen() {
   const router = useRouter()
+  const { success, error: notifyError } = useNotification()
+  const { signIn: contextSignIn, session } = useAuth(); // Destructure signIn and session from useAuth context. Note alias for error.
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -24,9 +28,9 @@ export default function AuthenticateScreen() {
     })
 
     if (error) {
-      alert(`Login Error: ${error.message}`) // Using browser alert for web
+      notifyError(`Login Error: ${error.message}`) // Using useNotification error
     } else {
-      alert('Welcome to JobPoster! 🎉 Please Check out the Job Vacancies')
+      success('Welcome to JobPoster! 🎉 Please Check out the Job Vacancies')
       router.replace('/')
     }
     setLoading(false)
@@ -34,7 +38,7 @@ export default function AuthenticateScreen() {
 
   async function signUpWithEmail() {
     if (password !== confirmPassword) {
-      alert('Error: Passwords do not match')
+      notifyError('Error: Passwords do not match') // Using useNotification error
       return
     }
 
@@ -50,9 +54,9 @@ export default function AuthenticateScreen() {
     })
 
     if (error) {
-      alert(`Sign Up Error: ${error.message}`) // Using browser alert for web
+      notifyError(`Sign Up Error: ${error.message}`) // Using useNotification error
     } else {
-      alert('Welcome to JobPoster! 🎉 Please Check out the Job Vacancies')
+      success('Welcome to JobPoster! 🎉 Please Check out the Job Vacancies')
       router.replace('/')
     }
     setLoading(false)

@@ -1,6 +1,7 @@
+import React from "react";
 import {
   JobPostFormData,
-  HtmlTemplate,
+  HtmlTemplate as TemplateType,
 } from "../constants/jobTemplates";
 import { generateTemplate1Html } from "../components/templates/Template1";
 import { generateTemplate2Html } from "../components/templates/Template2";
@@ -9,18 +10,17 @@ import { generateTemplate4Html } from "../components/templates/Template4";
 import { generateTemplate5Html } from "../components/templates/Template5";
 import { generateTemplate6Html } from "../components/templates/Template6";
 import { generateTemplate7Html } from "../components/templates/Template7";
+
 interface HtmlTemplateProps {
   formData: JobPostFormData;
-  template: HtmlTemplate;
+  template: TemplateType;
 }
 
-export default function generateHtmlTemplate({
-  formData,
-  template,
-}: HtmlTemplateProps): string {
-  if (!formData || !template) return "<h1>Loading...</h1>";
+const HtmlTemplate: React.FC<HtmlTemplateProps> = ({ formData, template }) => {
+  if (!formData || !template) {
+    return <div>Loading...</div>;
+  }
 
-  // Use a single default style for all templates
   const defaultStyle = {
     backgroundColor: "#FFFFFF",
     textColor: "#333333",
@@ -29,22 +29,35 @@ export default function generateHtmlTemplate({
     fontFamily: "Arial, sans-serif",
   };
 
+  let htmlString = "";
   switch (template.id) {
     case "template-1":
-      return generateTemplate1Html({ formData, ...defaultStyle });
+      htmlString = generateTemplate1Html({ formData, ...defaultStyle });
+      break;
     case "template-2":
-      return generateTemplate2Html({ formData, ...defaultStyle });
+      htmlString = generateTemplate2Html({ formData, ...defaultStyle });
+      break;
     case "template-3":
-      return generateTemplate3Html({ formData, ...defaultStyle });
+      htmlString = generateTemplate3Html({ formData, ...defaultStyle });
+      break;
     case "template-4":
-      return generateTemplate4Html({ formData, ...defaultStyle });
+      htmlString = generateTemplate4Html({ formData, ...defaultStyle });
+      break;
     case "template-5":
-      return generateTemplate5Html({ formData, ...defaultStyle });
+      htmlString = generateTemplate5Html({ formData, ...defaultStyle });
+      break;
     case "template-6":
-      return generateTemplate6Html({ formData, ...defaultStyle });
+      htmlString = generateTemplate6Html({ formData, ...defaultStyle });
+      break;
     case "template-7":
-      return generateTemplate7Html({ formData, ...defaultStyle });
+      htmlString = generateTemplate7Html({ formData, ...defaultStyle });
+      break;
     default:
-      return generateTemplate1Html({ formData, ...defaultStyle });
+      htmlString = generateTemplate1Html({ formData, ...defaultStyle });
+      break;
   }
-}
+
+  return <div dangerouslySetInnerHTML={{ __html: htmlString }} />;
+};
+
+export default HtmlTemplate;

@@ -9,17 +9,6 @@ import React, { useEffect, useState } from 'react';
 import { Input } from '../../components/ui/input';
 import { Button } from '../../components/ui/button';
 import { Spinner } from '../../components/ui/spinner';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '../../components/ui/alert-dialog';
 import { toast } from 'sonner';
 
 interface Job {
@@ -58,20 +47,16 @@ export default function AllJobsScreen() {
     const fetchJobs = async () => {
       setLoading(true);
       try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
+        const { data: { user } } = await supabase.auth.getUser();
 
         let query = supabase
           .from('jobs')
           .select('id, title, job_title, vacancy, job_type, category, experience, salary, job_description, company_name, company_address, company_email, company_phone, application_deadline, additional_info, poster_url, is_draft, user_id, template_id, template_style');
-
         if (user) {
           query = query.or(`is_draft.eq.false,user_id.eq.${user.id}`);
         } else {
           query = query.eq('is_draft', false);
         }
-
         const { data, error } = await query.order('created_at', { ascending: false });
 
         if (error) throw error;
@@ -123,8 +108,8 @@ export default function AllJobsScreen() {
 
 💼 *View more details:* ${item.poster_url || `https://sundarjobs.com/posts/preview?jobId=${item.id}&templateId=${item.template_id || ''}&styleId=${item.template_style || ''}`}
 
-🚀 *Find more jobs like this on SundarJobs!*
-    `;
+🚀 *Find more jobs like this on SundarJobs!*`;
+
     if (navigator.share) {
       try {
         await navigator.share({
@@ -137,16 +122,15 @@ export default function AllJobsScreen() {
         toast.error('Failed to share job post.');
       }
     } else {
-      // Fallback for browsers that don't support navigator.share
       prompt('Share this job opportunity:', jobDetails);
     }
   };
 
   if (loading) {
     return (
-      <div style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background }}>
-        <Spinner size="large" color={colors.tint} />
-        <p style={{ marginTop: 12, fontSize: '14px', fontWeight: '600', color: colors.secondaryText }}>
+      <div className="flex-1 flex items-center justify-center" style={{ backgroundColor: colors.background }}>
+        <Spinner width={32} height={32} color={colors.tint} />
+        <p className="mt-3 text-sm font-semibold" style={{ color: colors.secondaryText }}>
           Loading jobs...
         </p>
       </div>
@@ -158,12 +142,12 @@ export default function AllJobsScreen() {
       <div style={{ flex: 1, backgroundColor: '#F9FAFB' }}>
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, backgroundColor: '#FFFFFF', borderBottomWidth: 1, borderBottomColor: '#E5E7EB' }}>
           <Search width={18} height={18} color="#9CA3AF" style={{ marginRight: 8 }} />
-        <Input
-          className="flex-1 text-base text-[#111827]"
-          placeholder="Search jobs..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
+          <Input
+            className="flex-1 text-base text-[#111827]"
+            placeholder="Search jobs..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
           {searchQuery !== '' && (
             <Button variant="ghost" onClick={() => setSearchQuery('')}>
               <XCircle width={18} height={18} color="#9CA3AF" />
@@ -193,53 +177,53 @@ export default function AllJobsScreen() {
         paddingRight: 16,
         paddingTop: 12,
         paddingBottom: 12,
-        backgroundColor: item.is_draft ? '#FFFBEB' : '#FFFFFF', // draftItem background
-        borderLeftWidth: item.is_draft ? 4 : 0, // draftItem border
-        borderLeftColor: item.is_draft ? '#FCD34D' : 'transparent', // draftItem border
+        backgroundColor: item.is_draft ? '#FFFBEB' : '#FFFFFF',
+        borderLeftWidth: item.is_draft ? 4 : 0,
+        borderLeftColor: item.is_draft ? '#FCD34D' : 'transparent',
       }}
     >
-      <div style={{ flex: 1, marginRight: 12 }}> {/* jobInfo */}
-        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}> {/* jobTitleContainer */}
+      <div style={{ flex: 1, marginRight: 12 }}>
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
           <p style={{ fontSize: '15px', fontWeight: '600', color: '#111827', marginBottom: 2, flex: 1 }} className="truncate">
             {item.job_title}
           </p>
           {item.is_draft && (
-            <div style={{ backgroundColor: '#FEE2E2', paddingLeft: 8, paddingRight: 8, paddingTop: 2, paddingBottom: 2, borderRadius: 4, marginLeft: 8 }}> {/* draftBadge */}
-              <p style={{ color: '#EF4444', fontSize: '11px', fontWeight: '600' }}>Draft</p> {/* draftBadgeText */}
+            <div style={{ backgroundColor: '#FEE2E2', paddingLeft: 8, paddingRight: 8, paddingTop: 2, paddingBottom: 2, borderRadius: 4, marginLeft: 8 }}>
+              <p style={{ color: '#EF4444', fontSize: '11px', fontWeight: '600' }}>Draft</p>
             </div>
           )}
         </div>
         {item.company_name && (
-          <p style={{ fontSize: '13px', color: '#6B7280', marginBottom: 4 }} className="truncate"> {/* companyName */}
+          <p style={{ fontSize: '13px', color: '#6B7280', marginBottom: 4 }} className="truncate">
             {item.company_name}
           </p>
         )}
-        <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 4 }}> {/* jobDetailsRow */}
+        <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 4 }}>
           {item.job_type && (
-            <p style={{ fontSize: '12px', color: '#6B7280', display: 'flex', alignItems: 'center', gap: 4 }}> {/* jobDetailText */}
+            <p style={{ fontSize: '12px', color: '#6B7280', display: 'flex', alignItems: 'center', gap: 4 }}>
               <BriefcaseBusiness width={12} height={12} color="#6B7280" /> {item.job_type}
             </p>
           )}
           {item.category && (
-            <p style={{ fontSize: '12px', color: '#6B7280', display: 'flex', alignItems: 'center', gap: 4 }}> {/* jobDetailText */}
+            <p style={{ fontSize: '12px', color: '#6B7280', display: 'flex', alignItems: 'center', gap: 4 }}>
               <Tag width={12} height={12} color="#6B7280" /> {item.category}
             </p>
           )}
         </div>
-        <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 4 }}> {/* jobDetailsRow */}
+        <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 4 }}>
           {item.experience && (
-            <p style={{ fontSize: '12px', color: '#6B7280', display: 'flex', alignItems: 'center', gap: 4 }}> {/* jobDetailText */}
+            <p style={{ fontSize: '12px', color: '#6B7280', display: 'flex', alignItems: 'center', gap: 4 }}>
               <Timer width={12} height={12} color="#6B7280" /> {item.experience}
             </p>
           )}
           {item.salary && (
-            <p style={{ fontSize: '12px', color: '#6B7280', display: 'flex', alignItems: 'center', gap: 4 }}> {/* jobDetailText */}
+            <p style={{ fontSize: '12px', color: '#6B7280', display: 'flex', alignItems: 'center', gap: 4 }}>
               <Wallet width={12} height={12} color="#6B7280" /> {item.salary}
             </p>
           )}
         </div>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'row', gap: 8 }}> {/* actions */}
+      <div style={{ display: 'flex', flexDirection: 'row', gap: 8 }}>
         <Button
           style={{
             display: 'flex',
@@ -255,16 +239,13 @@ export default function AllJobsScreen() {
             color: 'white'
           }}
           onClick={() => {
-            router.push(
-              item.is_draft
-                ? `/posts/templates?jobId=${item.id}`
-                : `/posts/preview?jobId=${item.id}&templateId=${item.template_id || "default-template"}`
-            );
+            // Always navigate to the template selection page
+            router.push(`/posts/templates?jobId=${item.id}`);
           }}
-        >
-          <Eye width={16} height={16} color="white" />
-          <p style={{ fontSize: '13px', fontWeight: '600', color: '#FFFFFF' }}>View</p>
-        </Button>
+>
+  <Eye width={16} height={16} color="white" />
+  <p style={{ fontSize: '13px', fontWeight: '600', color: '#FFFFFF' }}>View</p>
+</Button>
         <Button
           onClick={() => handleShare(item)}
           style={{
@@ -291,31 +272,28 @@ export default function AllJobsScreen() {
   );
 
   return (
-    <div style={{ flex: 1, backgroundColor: '#F9FAFB' }}>
-      <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, backgroundColor: '#FFFFFF', borderBottomWidth: 1, borderBottomColor: '#E5E7EB' }}>
-        <Search width={18} height={18} color="#9CA3AF" style={{ marginRight: 8 }} />
-        <Input
-          className="flex-1 text-base text-[#111827]"
-          placeholder="Search jobs..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-        {searchQuery !== '' && (
-          <Button variant="ghost" onClick={() => setSearchQuery('')}>
-            <XCircle width={18} height={18} color="#9CA3AF" />
-          </Button>
-        )}
+    <div className="flex-1 bg-gray-100">
+      <div className="bg-white p-4 border-b border-gray-200 shadow-sm">
+        <div className="max-w-4xl mx-auto flex items-center">
+          <Search width={18} height={18} color="#9CA3AF" className="mr-2" />
+          <Input
+            className="flex-1 text-base text-gray-900"
+            placeholder="Search jobs..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery !== '' && (
+            <Button variant="ghost" onClick={() => setSearchQuery('')} className="ml-2">
+              <XCircle width={18} height={18} color="#9CA3AF" />
+            </Button>
+          )}
+        </div>
       </div>
-      <div
-        style={{
-          backgroundColor: '#FFFFFF',
-          paddingBottom: 20, // To match original FlatList contentContainerStyle bottom padding
-        }}
-      >
+      <div className="max-w-4xl mx-auto bg-white pb-5">
         {filteredJobs.map((item) => (
           <React.Fragment key={item.id}>
             {renderItem({ item })}
-            <div style={{ height: 1, backgroundColor: '#F3F4F6', marginLeft: 16 }} /> {/* separator */}
+            <div className="h-px bg-gray-200 ml-4" />
           </React.Fragment>
         ))}
       </div>
