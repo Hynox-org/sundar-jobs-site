@@ -1,276 +1,291 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useRef, Suspense } from "react"
-import { useRouter } from "next/navigation"
-import Header from "@/components/layout/header"
-import Stepper from "@/components/ui/stepper"
-import ModernTemplate from "@/components/templates/modern-template"
-import ProfessionalTemplate from "@/components/templates/professional-template"
-import CreativeTemplate from "@/components/templates/creative-template"
-import MinimalistTemplate from "@/components/templates/minimalist-template"
-import BoldTemplate from "@/components/templates/bold-template"
-import TechTemplate from "@/components/templates/tech-template"
-import { Download, Share2, Edit, ZoomIn, ZoomOut, Smartphone, Monitor } from "lucide-react"
-import { POSTER_SIZES } from "@/hooks/usePosterGeneration"
-import { useNotification } from "@/hooks/useNotification"
+import { useState, useEffect, useCallback, Suspense, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import Header from "@/components/layout/header";
+import HtmlTemplate from "@/components/HtmlTemplate";
+import {
+  HTML_TEMPLATES,
+  JobPostFormData,
+  HtmlTemplate as TemplateType,
+} from "@/constants/jobTemplates";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { ArrowRight, ChevronLeft } from "lucide-react";
+import { useNotification } from "@/hooks/useNotification";
+import { Spinner } from "@/components/ui/spinner";
+import { generatePosterFromElement, POSTER_SIZES, PosterSize } from "@/hooks/usePosterGeneration";
 
-const templateComponents: { [key: string]: any } = {
-  modern: ModernTemplate,
-  professional: ProfessionalTemplate,
-  creative: CreativeTemplate,
-  minimalist: MinimalistTemplate,
-  bold: BoldTemplate,
-  tech: TechTemplate,
-}
+function JobPreviewPageContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const jobId = searchParams.get("jobId") || "";
+  const templateId = searchParams.get("templateId") || "";
+  const supabase = createClientComponentClient();
+  const { success, error: notifyError } = useNotification();
 
-function PreviewPageContent() {
-  const router = useRouter()
-  const { success, error, loading } = useNotification()
-  const hasInitialized = useRef(false)
-  const posterRef = useRef<HTMLDivElement>(null)
-  const [formData, setFormData] = useState<any>(null)
-  const [selectedTemplate, setSelectedTemplate] = useState("modern")
-  const [customization, setCustomization] = useState<any>({
-    primaryColor: "#606C38",
-    secondaryColor: "#DDA15E",
-    fontFamily: "sans-serif",
-  })
-  const [zoom, setZoom] = useState(100)
-  const [previewMode, setPreviewMode] = useState<"desktop" | "mobile">("desktop")
-  const [selectedSize, setSelectedSize] = useState("instagram")
-  const [quality, setQuality] = useState<"low" | "medium" | "high">("high")
-  const [isGenerating, setIsGenerating] = useState(false)
+  const [formData, setFormData] = useState<JobPostFormData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [selectedPosterSizeId, setSelectedPosterSizeId] = useState<string>("instagram");
+
+  const previewRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (hasInitialized.current) return
-    hasInitialized.current = true
-
-    try {
-      const saved = localStorage.getItem("currentJobForm")
-      const template = localStorage.getItem("selectedTemplate")
-      const custom = localStorage.getItem("templateCustomization")
-
-      if (saved) setFormData(JSON.parse(saved))
-      else {
-        setTimeout(() => router.push("/form"), 2000)
-        return
+    async function loadFormData() {
+      setLoading(true);
+      setLoadError(null);
+      if (!jobId || !templateId) {
+        setLoadError("Missing job ID or template ID for preview.");
+        setFormData(null);
+        setLoading(false);
+        return;
       }
-      if (template) setSelectedTemplate(template)
-      if (custom) setCustomization(JSON.parse(custom))
-    } catch (err) {
-      console.error("Error loading preview:", err)
-      setTimeout(() => router.push("/form"), 2000)
-    }
-  }, [])
-
-  const handleDownload = async (format: "png" | "jpg") => {
-    if (!posterRef.current) {
-      error("Failed to generate poster")
-      return
-    }
-
-    setIsGenerating(true)
-    try {
-      const { generatePosterImage, downloadImage } = await import("@/hooks/usePosterGeneration")
-      const size = POSTER_SIZES[selectedSize]
-      const dataUrl = await generatePosterImage(posterRef.current, size.width, size.height, quality)
-      downloadImage(dataUrl, `job-poster-${Date.now()}`, format)
-      success(`Poster downloaded as ${format.toUpperCase()}!`)
-    } catch (err) {
-      console.error("Download error:", err)
-      error(`Failed to download ${format.toUpperCase()} poster`)
-    } finally {
-      setIsGenerating(false)
-    }
-  }
-
-  const handleShare = async () => {
-    try {
-      if (navigator.share) {
-        await navigator.share({
-          title: "Job Poster",
-          text: `Check out this job posting for ${formData?.jobTitle}`,
-        })
-        success("Shared successfully!")
+      const { data, error } = await supabase
+        .from("jobs")
+        .select("*")
+        .eq("id", jobId)
+        .single();
+      if (error || !data) {
+        setLoadError(`Could not load job data: ${error?.message || "Not found"}`);
+        setFormData(null);
       } else {
-        error("Share not supported on this device")
+        setFormData(data as JobPostFormData);
       }
-    } catch (err: any) {
-      if (err.name !== "AbortError") {
-        console.error("Share error:", err)
-        error("Failed to share poster")
-      }
+      setLoading(false);
     }
+    loadFormData();
+  }, [jobId, templateId, supabase]);
+
+  const handleGeneratePoster = useCallback(async () => {
+    if (!formData || !templateId || !previewRef.current) {
+      notifyError("Cannot generate poster: Missing job data, template ID, or preview element.");
+      return;
+    }
+    setIsGenerating(true);
+    const selectedSize = POSTER_SIZES[selectedPosterSizeId];
+    if (!selectedSize) {
+      notifyError("Invalid poster size selected.");
+      setIsGenerating(false);
+      return;
+    }
+
+    try {
+      const posterUrl = await generatePosterFromElement(previewRef.current, selectedSize);
+      if (posterUrl) {
+        const { error: updateError } = await supabase
+          .from("jobs")
+          .update({ poster_url: posterUrl })
+          .eq("id", jobId);
+        if (updateError) {
+          notifyError("Failed to save poster URL.");
+        } else {
+          success("Poster generated and saved!");
+          router.push(`/posts/success?jobId=${jobId}`);
+        }
+      } else {
+        notifyError("Failed to generate poster.");
+      }
+    } catch (err) {
+      console.error("Error generating poster:", err);
+      notifyError("An unexpected error occurred during poster generation.");
+    } finally {
+      setIsGenerating(false);
+    }
+  }, [formData, templateId, jobId, supabase, notifyError, success, router, selectedPosterSizeId]);
+
+
+  const selectedTemplate = HTML_TEMPLATES.find((t) => t.id === templateId);
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-background flex items-center justify-center">
+        <Spinner width={32} height={32} />
+        <p className="text-text-secondary ml-4">Loading preview...</p>
+      </main>
+    );
   }
 
-  if (!formData) return null
-
-  const TemplateComponent = templateComponents[selectedTemplate]
-
-  return (
-    <main className="min-h-screen bg-background">
-      <Header />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Stepper currentStep={3} steps={["Form", "Templates", "Preview"]} />
-
-        <h1 className="text-3xl font-bold mt-8 mb-8">Your Job Poster</h1>
-
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Main Preview */}
-          <div className="lg:col-span-3">
-            <div
-              className="bg-gray-200 rounded-xl overflow-auto flex items-center justify-center"
-              style={{
-                height: previewMode === "mobile" ? "600px" : "500px",
-                maxWidth: previewMode === "mobile" ? "300px" : "none",
-              }}
-            >
-              <div style={{ transform: `scale(${zoom / 100})`, transformOrigin: "top center" }}>
-                <div ref={posterRef} className="w-[400px] h-[400px]">
-                  <TemplateComponent
-                    formData={formData}
-                    primaryColor={customization.primaryColor}
-                    secondaryColor={customization.secondaryColor}
-                    fontFamily={customization.fontFamily}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Controls */}
-            <div className="mt-4 flex gap-2 justify-between items-center">
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setZoom(Math.max(25, zoom - 10))}
-                  className="p-2 hover:bg-surface rounded-lg transition-colors"
-                >
-                  <ZoomOut className="w-5 h-5" />
-                </button>
-                <span className="px-3 py-2 bg-surface rounded-lg text-sm font-semibold">{zoom}%</span>
-                <button
-                  onClick={() => setZoom(Math.min(150, zoom + 10))}
-                  className="p-2 hover:bg-surface rounded-lg transition-colors"
-                >
-                  <ZoomIn className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setPreviewMode("desktop")}
-                  className={`p-2 rounded-lg transition-colors ${
-                    previewMode === "desktop" ? "bg-[#606C38] text-white" : "hover:bg-surface"
-                  }`}
-                >
-                  <Monitor className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={() => setPreviewMode("mobile")}
-                  className={`p-2 rounded-lg transition-colors ${
-                    previewMode === "mobile" ? "bg-[#606C38] text-white" : "hover:bg-surface"
-                  }`}
-                >
-                  <Smartphone className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Sidebar Controls */}
-          <div className="space-y-6">
-            {/* Size Selection */}
-            <div className="bg-surface rounded-xl border border-border p-4">
-              <h3 className="font-bold mb-3">Poster Size</h3>
-              <select
-                value={selectedSize}
-                onChange={(e) => setSelectedSize(e.target.value)}
-                className="input-field w-full"
-              >
-                {Object.entries(POSTER_SIZES).map(([key, size]) => (
-                  <option key={key} value={key}>
-                    {size.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Quality Selection */}
-            <div className="bg-surface rounded-xl border border-border p-4">
-              <h3 className="font-bold mb-3">Export Quality</h3>
-              <div className="space-y-2">
-                {["low", "medium", "high"].map((q) => (
-                  <label key={q} className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="quality"
-                      value={q}
-                      checked={quality === q}
-                      onChange={(e) => setQuality(e.target.value as any)}
-                      className="w-4 h-4"
-                    />
-                    <span className="capitalize text-sm">{q}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Download Buttons */}
-            <div className="space-y-2">
-              <button
-                onClick={() => handleDownload("png")}
-                disabled={isGenerating}
-                className="w-full btn-primary flex items-center justify-center gap-2 disabled:opacity-50"
-              >
-                <Download className="w-4 h-4" />
-                {isGenerating ? "Generating..." : "PNG"}
-              </button>
-              <button
-                onClick={() => handleDownload("jpg")}
-                disabled={isGenerating}
-                className="w-full btn-secondary flex items-center justify-center gap-2 disabled:opacity-50"
-              >
-                <Download className="w-4 h-4" />
-                {isGenerating ? "Generating..." : "JPG"}
-              </button>
-            </div>
-
-            {/* Share Button */}
-            <button onClick={handleShare} className="w-full btn-tertiary flex items-center justify-center gap-2">
-              <Share2 className="w-4 h-4" />
-              Share
-            </button>
-
-            {/* Edit Button */}
+  if (!formData || !selectedTemplate || loadError) {
+    return (
+      <main className="min-h-screen bg-background">
+        <Header />
+        <div className="flex items-center justify-center h-96">
+          <div className="text-center">
+            <p className="text-text-secondary mb-4">
+              Error loading preview: {loadError || "Missing job data or invalid template."}
+            </p>
             <button
-              onClick={() => router.push("/templates")}
-              className="w-full flex items-center justify-center gap-2 p-2 hover:bg-surface rounded-lg transition-colors"
+              onClick={() => router.push("/alljobs")}
+              className="btn btn--primary"
             >
-              <Edit className="w-4 h-4" />
-              Edit Template
-            </button>
-
-            {/* Create New */}
-            <button
-              onClick={() => {
-                localStorage.removeItem("currentJobForm")
-                router.push("/")
-              }}
-              className="w-full btn-tertiary"
-            >
-              Create New
+              Go to All Jobs
             </button>
           </div>
         </div>
+      </main>
+    );
+  }
+
+  return (
+    <main className="bg-background">
+      <Header />
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
+        {/* Page Header */}
+        <div className="mb-12">
+          <button
+            onClick={() => router.back()}
+            className="inline-flex items-center gap-2 text-primary hover:text-primary-hover font-semibold mb-4 px-4 py-2 rounded-lg hover:bg-primary/5 transition-all"
+          >
+            <ChevronLeft className="w-5 h-5" />
+            Back to Template Selection
+          </button>
+          <h1 className="text-4xl md:text-5xl font-bold mb-3 text-text">
+            Final Poster Preview
+          </h1>
+          <p className="text-lg text-text-secondary">
+            This is how your job poster will look. Generate it if you're happy!
+          </p>
+        </div>
+
+        {/* Live Preview Section */}
+        <div className="bg-surface rounded-2xl border border-border p-8 shadow-sm mb-12">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold mb-2 text-text">
+              Live Poster Preview
+            </h2>
+            <p className="text-text-secondary">
+              Review the final look before generating.
+            </p>
+          </div>
+          <div className="flex justify-center mb-4">
+            {/* Poster Size Selector */}
+            <select
+              value={selectedPosterSizeId}
+              onChange={(e) => setSelectedPosterSizeId(e.target.value)}
+              className="p-2 border rounded-md"
+            >
+              {Object.entries(POSTER_SIZES).map(([key, size]) => (
+                <option key={key} value={key}>
+                  {size.name} ({size.width}x{size.height}px)
+                </option>
+              ))}
+            </select>
+          </div>
+          <div
+            className="relative p-4 flex justify-center items-center" /* Reduced padding */
+            style={{
+              background: "linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%)",
+              minHeight: '400px', // Ensure a minimum height for the preview area
+            }}
+          >
+            <div className="flex-1 flex justify-center items-center p-2"> {/* Flexible inner container */}
+              <div
+                ref={previewRef}
+                className="bg-white rounded-xl shadow-xl overflow-hidden" /* Added overflow-hidden */
+                style={{
+                  transformOrigin: "top center",
+                  transform: "scale(var(--scale-factor, 0.5))", /* Dynamic scaling */
+                  width: 'min(100%, 210mm)', /* Max width of container, but limited to A4 */
+                  height: 'auto',
+                  aspectRatio: '210 / 297', /* Maintain A4 aspect ratio */
+                  boxSizing: 'content-box', /* Ensure padding/border doesn't mess with width */
+                }}
+              >
+                <HtmlTemplate
+                  formData={formData}
+                  template={selectedTemplate}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-4 justify-between flex-wrap">
+          <button
+            onClick={() => router.back()}
+            className="btn btn--outline flex items-center gap-2"
+            disabled={isGenerating}
+          >
+            <ChevronLeft className="w-5 h-5" />
+            Back
+          </button>
+          <button
+            onClick={handleGeneratePoster}
+            className="btn btn--primary flex items-center gap-2"
+            disabled={isGenerating || !formData || !selectedTemplate}
+          >
+            {isGenerating ? (
+              <>
+                <Spinner className="h-5 w-5 mr-2" />
+                Generating Poster...
+              </>
+            ) : (
+              <>
+                Generate Poster
+                <ArrowRight className="w-5 h-5" />
+              </>
+            )}
+          </button>
+        </div>
       </div>
+      <style jsx>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes bounceIn {
+          0% {
+            opacity: 0;
+            transform: scale(0);
+          }
+          50% {
+            transform: scale(1.1);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        /* Responsive scaling for the template preview */
+        .bg-white.rounded-xl.shadow-xl {
+          --scale-factor: 0.5; /* Default scale */
+        }
+        @media (max-width: 1400px) {
+          .bg-white.rounded-xl.shadow-xl { --scale-factor: 0.45; }
+        }
+        @media (max-width: 1200px) {
+          .bg-white.rounded-xl.shadow-xl { --scale-factor: 0.4; }
+        }
+        @media (max-width: 1024px) { /* Tailor for medium screens */
+          .bg-white.rounded-xl.shadow-xl { --scale-factor: 0.35; }
+        }
+        @media (max-width: 900px) {
+          .bg-white.rounded-xl.shadow-xl { --scale-factor: 0.3; }
+        }
+        @media (max-width: 768px) { /* Tailor for small screens */
+          .bg-white.rounded-xl.shadow-xl { --scale-factor: 0.25; }
+        }
+        @media (max-width: 600px) {
+          .bg-white.rounded-xl.shadow-xl { --scale-factor: 0.2; }
+        }
+      `}</style>
     </main>
-  )
+  );
 }
 
-export default function PreviewPage() {
+// Export default page with Suspense fallback
+export default function JobPreviewPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-background" />}>
-      <PreviewPageContent />
+    <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center">Loading...</div>}>
+      <JobPreviewPageContent />
     </Suspense>
-  )
+  );
 }

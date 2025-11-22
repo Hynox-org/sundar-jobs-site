@@ -4,35 +4,11 @@ import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 import Header from "@/components/layout/header"
 import { FileText, Bookmark, Settings } from "lucide-react"
-
-interface DraftData {
-  id: string
-  jobTitle: string
-  formData?: {
-    companyName?: string
-  }
-  savedAt: string
-}
+import { BUSINESS_SECTORS } from "@/constants/business-sectors" // Import business sectors
+import { BusinessSectorCard } from "@/components/business-sector-card" // Import BusinessSectorCard
 
 export default function Home() {
   const router = useRouter()
-const [drafts, setDrafts] = useState<DraftData[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    try {
-      const savedDrafts = localStorage.getItem("savedDrafts")
-      if (savedDrafts) {
-        setDrafts(JSON.parse(savedDrafts))
-      }
-    } catch (error) {
-      console.error("Failed to load drafts:", error)
-      // Silently fail - just show empty drafts
-      setDrafts([])
-    } finally {
-      setIsLoading(false)
-    }
-  }, [])
 
   return (
     <main className="min-h-screen bg-white">
@@ -72,25 +48,15 @@ const [drafts, setDrafts] = useState<DraftData[]>([])
           </div>
         </div>
 
-        {/* Recent Drafts */}
-        {!isLoading && drafts.length > 0 && (
-          <div>
-            <h2 className="text-2xl font-bold mb-6">Recent Drafts</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {drafts.slice(0, 6).map((draft) => (
-                <div
-                  key={draft.id}
-                  className="card cursor-pointer hover:border-[#606C38]"
-                  onClick={() => router.push(`/form?draftId=${draft.id}`)}
-                >
-                  <h4 className="font-semibold text-lg mb-2">{draft.jobTitle}</h4>
-                  <p className="text-text-muted text-sm mb-4">{draft.formData?.companyName}</p>
-                  <p className="text-text-light text-xs">Saved {new Date(draft.savedAt).toLocaleDateString()}</p>
-                </div>
-              ))}
-            </div>
+        {/* Job Categories Section */}
+        <div className="mt-8">
+          <h2 className="text-3xl font-bold text-text mb-6 text-center">Browse Job Categories</h2>
+          <div className="flex flex-wrap justify-center -m-2"> {/* Use -m-2 to offset inner p-2 */}
+            {BUSINESS_SECTORS.map((sector) => (
+              <BusinessSectorCard key={sector.id} sector={sector} />
+            ))}
           </div>
-        )}
+        </div>
       </div>
     </main>
   )
