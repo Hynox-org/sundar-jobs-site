@@ -69,8 +69,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const fetchSession = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        processSession(session);
+        const { data } = await supabase.auth.getSession();
+        processSession(data.session);
       } catch (e: any) {
         console.error("Error initializing auth session:", e);
         setIsLoading(false);

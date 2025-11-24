@@ -44,7 +44,8 @@ export function generateTemplate6Html({ formData }: { formData: JobPostFormData 
         margin: 0;
       }
       * {
-        margin: 0; padding: 0; box-sizing: border-box;
+        // margin: 0; 
+        padding: 0; box-sizing: border-box;
       }
       @media print {
         html, body {
@@ -95,16 +96,21 @@ export function generateTemplate6Html({ formData }: { formData: JobPostFormData 
         }
       }
       html, body {
-        width: 100%; height: 100vh;
+        width: 100%; 
+        height: 100%;
         margin: 0;
-        display: flex; justify-content: center; align-items: center;
+        display: flex; 
+        justify-content: center; 
+        align-items: flex-start;
         padding: 0;
-        background: ${backgroundColor};
+        // background: ${backgroundColor};
         font-family: ${fontFamily};
         color: ${textColor};
       }
       .container {
-        width: 210mm; max-height: 297mm; min-height: auto;
+        width: 210mm; 
+        min-height: 297mm; 
+        max-height: auto;
         background: #181824;
         position: relative;
         display: flex; flex-direction: column;

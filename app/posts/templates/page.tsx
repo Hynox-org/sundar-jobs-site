@@ -105,11 +105,10 @@ function PostTemplatesPageContent() {
 
   const selectedTemplate =
     HTML_TEMPLATES.find((t) => t.id === selectedTemplateId) || HTML_TEMPLATES[0];
-
   return (
-    <main className="bg-white min-h-screen">
+    <main className="bg-white">
       <Header />
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
 
         {/* Page Header */}
         <div className="mb-12">
@@ -175,17 +174,18 @@ function PostTemplatesPageContent() {
           })}
         </div>
         {/* Live Preview Section */}
-        <section className="w-full flex flex-col items-center justify-center bg-gray-50 border border-gray-200 rounded-2xl shadow py-12 mb-10 max-w-2xl mx-auto">
+        <section className="w-full flex flex-col items-center justify-center rounded-2xl shadow">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold mb-2 text-gray-800">Live Template Preview</h2>
             <p className="text-gray-600">This is a dynamic preview of your selected template.</p>
           </div>
-          <div className="flex justify-center w-full">
+          <div className="flex justify-center w-full h-auto">
             <div
               className="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-100 mx-auto"
               style={{
-                width: "340px", // will shrink on sm screens
-                maxWidth: "92vw",
+                width: "98%", // will shrink on sm screens
+                height: "auto",
+                maxWidth: "100vw",
                 aspectRatio: "210 / 297"
               }}
             >
@@ -195,7 +195,7 @@ function PostTemplatesPageContent() {
         </section>
 
         {/* Action Buttons */}
-        <div className="flex gap-4 justify-between flex-wrap mt-8">
+        <div className="flex gap-4 justify-between flex-wrap mt-8 mb-8">
           <button
             onClick={() => router.back()}
             className="btn btn--outline flex items-center gap-2"

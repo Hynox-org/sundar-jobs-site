@@ -33,7 +33,7 @@ export function BusinessSectorCard({ sector }: BusinessSectorCardProps) {
   };
 
   // Dynamically get the Lucide icon component, ensure it's a valid React component
-  const IconComponent = (LucideIcons[sector.icon as keyof typeof LucideIcons] || LucideIcons.Briefcase) as React.ComponentType<LucideProps>;
+  // const IconComponent = (LucideIcons[sector.icon as keyof typeof LucideIcons] || LucideIcons.Briefcase) as React.ComponentType<LucideProps>;
 
   return (
     <button
@@ -42,7 +42,7 @@ export function BusinessSectorCard({ sector }: BusinessSectorCardProps) {
     >
       <div className="card flex flex-col items-center justify-center p-4 aspect-square">
         <div className="mb-2">
-          <IconComponent className="w-12 h-12 text-[#007AFF]" />
+          <img src={sector.icon} alt={sector.name} width={48} height={48} />
         </div>
         <p className="text-lg font-semibold text-center">
           {displayEnglish ? sector.name : sector.name_ta}

@@ -46,7 +46,7 @@ export function generateTemplate7Html({ formData }: { formData: JobPostFormData 
       }
 
       * {
-        margin: 0;
+        // margin: 0;
         padding: 0;
         box-sizing: border-box;
       }
@@ -102,12 +102,12 @@ export function generateTemplate7Html({ formData }: { formData: JobPostFormData 
 
       html, body {
         width: 100%;
-        height: 100vh;
+        height: 100%;
         margin: 0;
         display: flex;
         justify-content: center;
-        align-items: center;
-        background: ${backgroundColor};
+        align-items: flex-start;
+        // background: ${backgroundColor};
         font-family: ${fontFamily};
         color: ${textColor};
       }
@@ -118,8 +118,8 @@ export function generateTemplate7Html({ formData }: { formData: JobPostFormData 
 
       .container {
         width: 210mm;
-        max-height: 297mm;
-        min-height: auto;
+        min-height: 297mm;
+        max-height: auto;
         background: ${backgroundColor};
         position: relative;
         display: flex;
