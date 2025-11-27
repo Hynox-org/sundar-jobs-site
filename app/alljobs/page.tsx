@@ -243,9 +243,9 @@ export default function AllJobsScreen() {
             router.push(`/posts/templates?jobId=${item.id}`);
           }}
 >
-  <Eye width={16} height={16} color="white" />
-  <p style={{ fontSize: '13px', fontWeight: '600', color: '#FFFFFF' }}>View</p>
-</Button>
+          <Eye width={16} height={16} color="white" />
+  <p      style={{ fontSize: '13px', fontWeight: '600', color: '#FFFFFF' }}>View</p>
+        </Button>
         <Button
           onClick={() => handleShare(item)}
           style={{

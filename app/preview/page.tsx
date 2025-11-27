@@ -10,7 +10,7 @@ import {
   HtmlTemplate as TemplateType,
 } from "@/constants/jobTemplates";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { ArrowRight, ChevronLeft } from "lucide-react";
+import { ArrowLeft, ChevronLeft } from "lucide-react";
 import { useNotification } from "@/hooks/useNotification";
 import { Spinner } from "@/components/ui/spinner";
 import { generatePosterFromElement, POSTER_SIZES, PosterSize } from "@/hooks/usePosterGeneration";
@@ -130,9 +130,9 @@ function JobPreviewPageContent() {
   return (
     <main className="bg-background">
       <Header />
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
+      <div className=" mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
         {/* Page Header */}
-        <div className="mb-12">
+        <div className="mb-12 mt-12">
           <button
             onClick={() => router.back()}
             className="inline-flex items-center gap-2 text-primary hover:text-primary-hover font-semibold mb-4 px-4 py-2 rounded-lg hover:bg-primary/5 transition-all"
@@ -147,7 +147,27 @@ function JobPreviewPageContent() {
             This is how your job poster will look. Generate it if you're happy!
           </p>
         </div>
-
+{/* Action Buttons */}
+        <div className="flex gap-4 justify-between flex-wrap">
+          
+          <button
+          
+            className="btn btn--primary flex items-center gap-2"
+            disabled={isGenerating || !formData || !selectedTemplate}
+          >
+            {isGenerating ? (
+              <>
+                <Spinner className="h-5 w-5 mr-2" />
+                Generating PDF...
+              </>
+            ) : (
+              <>
+                <ArrowLeft className="w-4 h-4" />
+                Generate PDF
+              </>
+            )}
+          </button>
+        </div>
         {/* Live Preview Section */}
         <div className="bg-surface rounded-2xl border border-border p-8 shadow-sm mb-12">
           <div className="text-center mb-8">
@@ -172,11 +192,12 @@ function JobPreviewPageContent() {
               ))}
             </select>
           </div>
+          
           <div
             className="relative p-4 flex justify-center items-center" /* Reduced padding */
             style={{
               background: "linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%)",
-              minHeight: '400px', // Ensure a minimum height for the preview area
+              minWidth: "75%", // Ensure a minimum height for the preview area
             }}
           >
             <div className="flex-1 flex justify-center items-center p-2"> {/* Flexible inner container */}
@@ -184,10 +205,10 @@ function JobPreviewPageContent() {
                 ref={previewRef}
                 className="bg-white rounded-xl shadow-xl overflow-hidden" /* Added overflow-hidden */
                 style={{
-                  transformOrigin: "top center",
+                  transformOrigin: "center center",
                   transform: "scale(var(--scale-factor, 0.5))", /* Dynamic scaling */
-                  width: 'min(100%, 210mm)', /* Max width of container, but limited to A4 */
-                  height: 'auto',
+                  width: "100%", /* Max width of container, but limited to A4 */
+                  height: '100%',
                   aspectRatio: '210 / 297', /* Maintain A4 aspect ratio */
                   boxSizing: 'content-box', /* Ensure padding/border doesn't mess with width */
                 }}
@@ -200,35 +221,13 @@ function JobPreviewPageContent() {
             </div>
           </div>
         </div>
-
-        {/* Action Buttons */}
-        <div className="flex gap-4 justify-between flex-wrap">
-          <button
-            onClick={() => router.back()}
-            className="btn btn--outline flex items-center gap-2"
-            disabled={isGenerating}
-          >
-            <ChevronLeft className="w-5 h-5" />
-            Back
-          </button>
-          <button
-            onClick={handleGeneratePoster}
-            className="btn btn--primary flex items-center gap-2"
-            disabled={isGenerating || !formData || !selectedTemplate}
-          >
-            {isGenerating ? (
-              <>
-                <Spinner className="h-5 w-5 mr-2" />
-                Generating Poster...
-              </>
-            ) : (
-              <>
-                Generate Poster
-                <ArrowRight className="w-5 h-5" />
-              </>
-            )}
-          </button>
-        </div>
+        <div className="mt-8 flex justify-center">
+            <button
+              className="btn btn--primary bg-amber-700 p-5 flex items-center gap-2"
+            >
+              Post the Job
+            </button>
+          </div>
       </div>
       <style jsx>{`
         @keyframes fadeInUp {
@@ -289,3 +288,4 @@ export default function JobPreviewPage() {
     </Suspense>
   );
 }
+

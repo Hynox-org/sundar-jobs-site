@@ -53,90 +53,89 @@ export function generateTemplate5Html({
       }
 
       * {
-        margin: 0;
+        // margin: 0;
         padding: 0;
         box-sizing: border-box;
       }
 
       @media print {
-  html, body {
-    background-color: ${backgroundColor} !important;
-    color: ${textColor} !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
+        html, body {
+          background-color: ${backgroundColor} !important;
+          color: ${textColor} !important;
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+      }
 
-  /* Apply colors to main containers */
-  .container {
-    background-color: ${backgroundColor} !important;
-  }
+      /* Apply colors to main containers */
+      .container {
+        background-color: ${backgroundColor} !important;
+      }
 
-  /* Preserve your text colors for headings and key sections */
-  .we-are-hiring {
-    color: ${textColor} !important;
-  }
-  .we-are {
-    color: ${primaryColor} !important;
-  }
-  .section-title {
-    color: ${primaryColor} !important;
-  }
-  .job-item {
-    background-color: ${primaryColor}33 !important; /* translucent */
-    border-color: ${primaryColor} !important;
-    color: ${textColor} !important;
-  }
-  .job-title {
-    color: ${textColor} !important;
-  }
-  .job-requirements {
-    color: ${textColor} !important;
-  }
-  .company-section {
-    background-color: ${primaryColor}10 !important; /* translucent bg */
-    border-top: 3px solid ${primaryColor} !important;
-    border-bottom: 3px solid ${primaryColor} !important;
-    color: ${textColor} !important;
-  }
-  .company-name {
-    color: ${primaryColor} !important;
-  }
-  .contact-item {
-    color: ${textColor} !important;
-  }
-  .app-section {
-    background-color: ${textColor} !important;
-    color: #FFFFFF !important;
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-    page-break-before: avoid !important;
-    page-break-after: avoid !important;
-    box-shadow: none !important;
-  }
-  .app-left, .app-right {
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-  /* To avoid splitting sections across pages */
-  .main-content,
-  .job-positions-section,
-  .company-section,
-  .app-section {
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-  /* Prevent page breaks before/after footer if needed */
-  .app-section {
-    page-break-before: avoid !important;
-    page-break-after: avoid !important;
-  }
-  /* Remove text-shadow/filter effects for clarity */
-  * {
-    text-shadow: none !important;
-    filter: none !important;
-  }
-}
-
+      /* Preserve your text colors for headings and key sections */
+      .we-are-hiring {
+        color: ${textColor} !important;
+      }
+      .we-are {
+        color: ${primaryColor} !important;
+      }
+      .section-title {
+        color: ${primaryColor} !important;
+      }
+      .job-item {
+        background-color: ${primaryColor}33 !important; /* translucent */
+        border-color: ${primaryColor} !important;
+        color: ${textColor} !important;
+      }
+      .job-title {
+        color: ${textColor} !important;
+      }
+      .job-requirements {
+        color: ${textColor} !important;
+      }
+      .company-section {
+        background-color: ${primaryColor}10 !important; /* translucent bg */
+        border-top: 3px solid ${primaryColor} !important;
+        border-bottom: 3px solid ${primaryColor} !important;
+        color: ${textColor} !important;
+      }
+      .company-name {
+        color: ${primaryColor} !important;
+      }
+      .contact-item {
+        color: ${textColor} !important;
+      }
+      .app-section {
+        background-color: ${textColor} !important;
+        color: #FFFFFF !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        page-break-before: avoid !important;
+        page-break-after: avoid !important;
+        box-shadow: none !important;
+      }
+      .app-left, .app-right {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+      /* To avoid splitting sections across pages */
+      .main-content,
+      .job-positions-section,
+      .company-section,
+      .app-section {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+      /* Prevent page breaks before/after footer if needed */
+      .app-section {
+        page-break-before: avoid !important;
+        page-break-after: avoid !important;
+      }
+      /* Remove text-shadow/filter effects for clarity */
+      * {
+        text-shadow: none !important;
+        filter: none !important;
+      }
+    }
 
       html,
       body {
@@ -147,7 +146,7 @@ export function generateTemplate5Html({
         justify-content: center;
         align-items: flex-start;
         padding: 0;
-        background: ${backgroundColor};
+        // background: ${backgroundColor};
         font-family: ${fontFamily};
         color: ${textColor};
       }
@@ -158,8 +157,8 @@ export function generateTemplate5Html({
 
       .container {
         width: 210mm;
-        max-height: 297mm;
-        min-height: auto;
+        min-height: 297mm;
+        max-height: auto;
         background: ${backgroundColor};
         position: relative;
         display: flex;
@@ -189,10 +188,10 @@ export function generateTemplate5Html({
 
       /* Main Content */
       .main-content {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;    /* center children vertically */
-  flex-grow: 1;               /* fill container height */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;    /* center children vertically */
+        flex-grow: 1;               /* fill container height */
         position: relative;
         z-index: 5;
       }

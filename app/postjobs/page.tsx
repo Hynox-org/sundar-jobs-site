@@ -398,7 +398,7 @@ const handleSaveJob = async (action: "draft" | "template") => {
             justifyContent: 'space-between'
           }}>
             <Button
-              className="flex-1"
+              className="flex-1 p-6"
               style={{ backgroundColor: "#6B7280" }}
               onClick={() => handleSaveJob("draft")}
             >
@@ -407,7 +407,7 @@ const handleSaveJob = async (action: "draft" | "template") => {
               </span>
             </Button>
             <Button
-              className="flex-1"
+              className="flex-1 p-6"
               style={{ backgroundColor: "#2563EB" }}
               onClick={() => handleSaveJob("template")}
             >

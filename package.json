@@ -48,7 +48,7 @@
     "date-fns": "4.1.0",
     "embla-carousel-react": "8.5.1",
     "expo": "^54.0.25",
-    "html2canvas": "latest",
+    "html2canvas": "^1.4.1",
     "input-otp": "1.4.1",
     "jspdf": "^3.0.4",
     "lucide-react": "^0.454.0",
@@ -60,6 +60,7 @@
     "react-dom": "19.2.0",
     "react-hook-form": "^7.60.0",
     "react-native": "^0.82.1",
+    "react-native-svg": "^15.15.0",
     "react-native-web": "^0.21.2",
     "react-resizable-panels": "^2.1.7",
     "recharts": "2.15.4",
@@ -70,6 +71,7 @@
     "zod": "3.25.76"
   },
   "devDependencies": {
+    "@svgr/webpack": "^8.1.0",
     "@tailwindcss/postcss": "^4.1.9",
     "@types/node": "^22",
     "@types/react": "^19",

@@ -45,7 +45,7 @@ export function generateTemplate2Html({ formData }: { formData: JobPostFormData 
       }
 
       * {
-        margin: 0;
+        // margin: 0;
         padding: 0;
         box-sizing: border-box;
       }
@@ -101,20 +101,20 @@ export function generateTemplate2Html({ formData }: { formData: JobPostFormData 
 
       html, body {
         width: 100%;
-        height: 100vh;
+        height: 100%;
         margin: 0;
         display: flex;
         justify-content: center;
-        align-items: center;
-        background: ${backgroundColor};
+        align-items: flex-start;
+        // background: ${backgroundColor};
         font-family: ${fontFamily};
         color: ${textColor};
       }
 
       .container {
         width: 210mm;
-        max-height: 297mm;
-        min-height: auto;
+        min-height: 297mm;
+        max-height: auto;
         background: #12132A; /* Slightly darker container background */
         position: relative;
         display: flex;
@@ -125,12 +125,12 @@ export function generateTemplate2Html({ formData }: { formData: JobPostFormData 
         height: 100vh;
         border-radius: 15px;
       }
-.main-content {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;    /* center children vertically */
-  flex-grow: 1;               /* fill container height */
-}
+      .main-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;    /* center children vertically */
+        flex-grow: 1;               /* fill container height */
+      }
       /* Megaphone Icon */
       .megaphone-icon {
         position: absolute;

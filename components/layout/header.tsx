@@ -16,9 +16,7 @@ export default function Header() {
     { name: "About", href: "/about", icon: Info },
     { name: "Post Jobs", href: "/postjobs", icon: BriefcaseBusiness },
     { name: "All Jobs", href: "/alljobs", icon: ListTodo },
-    { name: "Drafts", href: "/drafts", icon: Bookmark },
-    { name: "Settings", href: "/settings", icon: SettingsIcon },
-  ]
+    ]
 
   const handleLogout = async () => {
     await signOut(); // Use signOut from auth context
