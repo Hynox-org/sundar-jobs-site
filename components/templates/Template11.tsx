@@ -1,14 +1,14 @@
 import { JobPostFormData } from "@/constants/jobTemplates";
 
-export function generateTemplate4Html({ formData }: { formData: JobPostFormData }): string {
+export function generateTemplate11Html({ formData }: { formData: JobPostFormData }): string {
   if (!formData) return '<h1>Loading...</h1>';
 
   // Modern vibrant color scheme
-  const primaryColor = '#3A86FF';
-  const secondaryColor = '#2B2D42';
-  const accentColor = '#FFBE0B';
-  const darkColor = '#111122';
-  const lightColor = '#EDF2F4';
+  const primaryColor = '#606C38';
+  const secondaryColor = '#BC4749';
+  const accentColor = '#283618';
+  const darkColor = '#1A1A1A';
+  const lightColor = '#FEFAE0';
   const fontFamily = "'Inter', sans-serif";
 
   // Calculate scaling with more aggressive reduction

@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 import Image from "next/image" // Import Image component
 import { useState } from "react"
-import { Menu, X, Bookmark, SettingsIcon, LogOut, Briefcase, Users, HomeIcon, Info, BriefcaseBusiness, ListTodo } from "lucide-react" // Added more Lucide icons
+import { Menu, X, LogOut, Users, BriefcaseBusiness, ListTodo, FileText } from "lucide-react"
 import { useAuth } from "@/context/auth-context" // Import useAuth hook
 
 export default function Header() {
@@ -12,11 +12,10 @@ export default function Header() {
   const { isLoggedIn, signOut, isLoading: authLoading } = useAuth(); // Use auth context
 
   const loggedInNav = [
-    { name: "Home", href: "/", icon: HomeIcon },
-    { name: "About", href: "/about", icon: Info },
     { name: "Post Jobs", href: "/postjobs", icon: BriefcaseBusiness },
+    { name: "Your Posts", href: "/yourposts", icon: FileText },
     { name: "All Jobs", href: "/alljobs", icon: ListTodo },
-    ]
+  ]
 
   const handleLogout = async () => {
     await signOut(); // Use signOut from auth context
@@ -24,9 +23,7 @@ export default function Header() {
   }
 
   const loggedOutNav = [
-    { name: "Home", href: "/", icon: HomeIcon },
-    { name: "About", href: "/about", icon: Info },
-    // { name: "Login/Signup", href: "/login", icon: Users },
+    { name: "All Jobs", href: "/alljobs", icon: ListTodo },
   ]
 
   const currentNav = isLoggedIn ? loggedInNav : loggedOutNav
@@ -67,11 +64,11 @@ export default function Header() {
               </button>
             ) : (
               <button
-                onClick={() => router.push("/login")}
+                onClick={() => router.push("/signin")}
                 className="flex items-center gap-2 text-text-muted hover:text-text transition-colors"
               >
                 <Users className="w-4 h-4" />
-                Login
+                Login/Register
               </button>
             )}
           </div>
@@ -110,13 +107,13 @@ export default function Header() {
             {!isLoggedIn && (
               <button
                 onClick={() => {
-                  router.push("/login")
+                  router.push("/signin")
                   setIsOpen(false)
                 }}
                 className="block w-full text-left px-4 py-2 text-text-muted hover:text-text"
               >
                 <Users className="w-4 h-4 mr-2 inline-block" />
-                Login/Signup
+                Login/Register
               </button>
             )}
           </div>

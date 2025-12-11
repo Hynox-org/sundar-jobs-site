@@ -1,22 +1,8 @@
-import { SvgProps } from 'react-native-svg';
-import BeautyAndSalonSvg from './../public/beauty-and-salon.svg';
-import CleaningAndHousekeepingSvg from './../public/cleaning-and-housekeeping.svg';
-import ComputerMobileWorkSvg from './../public/computer-mobile-work.svg';
-import FactoryAndProductionSvg from './../public/factory-and-production.svg';
-import LaundryAndIroningSvg from './../public/laundry-and-ironing.svg';
-import MoneyBankWorkSvg from './../public/money-bank-work.svg';
-import RepairAndFixingSvg from './../public/repair-and-fixing.svg';
-import SchoolAndTeachingSvg from './../public/school-and-teaching.svg';
-import SecurityAndWatchmanSvg from './../public/security-and-watchman.svg';
-import ShopAndSalesRetailSvg from './../public/shop-and-sales-retail.svg';
-import TailoringAndClothsSvg from './../public/tailoring-and-cloths.svg';
-import VerificationAndCheckingSvg from './../public/verification-and-checking.svg';
-
 export interface BusinessSector {
   id: string;
-  name: string;
-  name_ta: string; // Tamil name property
-  icon: string; // Placeholder for icon name or path (e.g., from Lucide React)
+  name: string; // Added name property
+  name_ta: string; // Added Tamil name property
+  icon: string; // Path to SVG icon in public folder
 }
 
 export const BUSINESS_SECTORS: BusinessSector[] = [
@@ -33,3 +19,4 @@ export const BUSINESS_SECTORS: BusinessSector[] = [
   { id: '11', name: 'Tailoring & Clothing', name_ta: 'தையல் மற்றும் ஆடை', icon: '/tailoring-and-cloths.svg' },
   { id: '12', name: 'Verification and Checking', name_ta: 'சரிபார்ப்பு மற்றும் ஆய்வு', icon: '/verification-and-checking.svg' },
 ];
+

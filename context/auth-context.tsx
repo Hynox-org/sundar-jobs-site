@@ -106,7 +106,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoggedIn(false);
       setIsAdmin(false);
       alert("You have been logged out.");
-      router.push('/login'); // Redirect to login page after logout
+      router.push('/signin'); // Redirect to signin page after logout
     }
     setIsLoading(false);
   };
