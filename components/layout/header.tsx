@@ -14,7 +14,7 @@ export default function Header() {
   const loggedInNav = [
     { name: "Post Jobs", href: "/postjobs", icon: BriefcaseBusiness },
     { name: "Your Posts", href: "/yourposts", icon: FileText },
-    { name: "All Jobs", href: "/alljobs", icon: ListTodo },
+    { name: "All Jobs", href: "/jobs/all", icon: ListTodo },
   ]
 
   const handleLogout = async () => {

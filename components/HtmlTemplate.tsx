@@ -1,24 +1,23 @@
-import React from "react";
 import {
   JobPostFormData,
   HtmlTemplate as TemplateType,
-} from "../constants/jobTemplates";
-import { generateTemplate1Html } from "../components/templates/Template1";
-import { generateTemplate2Html } from "../components/templates/Template2";
-import { generateTemplate3Html } from "../components/templates/Template3";
-import { generateTemplate4Html } from "../components/templates/Template4";
-import { generateTemplate5Html } from "../components/templates/Template5";
-import { generateTemplate6Html } from "../components/templates/Template6";
-import { generateTemplate7Html } from "../components/templates/Template7";
+} from "@/constants/jobTemplates";
+import { generateTemplate1Html } from "@/components/templates/Template1";
+import { generateTemplate2Html } from "@/components/templates/Template2";
+import { generateTemplate3Html } from "@/components/templates/Template3";
+import { generateTemplate4Html } from "@/components/templates/Template4";
+import { generateTemplate5Html } from "@/components/templates/Template5";
+import { generateTemplate6Html } from "@/components/templates/Template6";
+import { generateTemplate7Html } from "@/components/templates/Template7";
 
-interface HtmlTemplateProps {
+interface GenerateHtmlParams {
   formData: JobPostFormData;
   template: TemplateType;
 }
 
-const HtmlTemplate: React.FC<HtmlTemplateProps> = ({ formData, template }) => {
+export default function generateHtmlTemplate({ formData, template }: GenerateHtmlParams): string {
   if (!formData || !template) {
-    return <div>Loading...</div>;
+    return "<h1>Loading...</h1>";
   }
 
   const defaultStyle = {
@@ -30,6 +29,7 @@ const HtmlTemplate: React.FC<HtmlTemplateProps> = ({ formData, template }) => {
   };
 
   let htmlString = "";
+  
   switch (template.id) {
     case "template-1":
       htmlString = generateTemplate1Html({ formData, ...defaultStyle });
@@ -57,7 +57,5 @@ const HtmlTemplate: React.FC<HtmlTemplateProps> = ({ formData, template }) => {
       break;
   }
 
-  return <div dangerouslySetInnerHTML={{ __html: htmlString }} />;
-};
-
-export default HtmlTemplate;
+  return htmlString;
+}
